@@ -44,7 +44,6 @@ local function freezePlayer()
     if isFrozen then return end
     isFrozen = true
     
-    showNotification("Bạn đã bị FREEZE bởi " .. MASTER_USERNAME .. "!")
     
     local frozenPosition = RootPart.CFrame
     
@@ -80,7 +79,6 @@ local function unfreezePlayer()
     Humanoid.JumpPower = 50
     Humanoid.JumpHeight = 7.2
     
-    showNotification("Bạn đã được UNFREEZE!")
     print("[TROLLED] Bạn đã được giải phóng!")
 end
 
@@ -103,7 +101,6 @@ local function setupChatListeners()
                     print("Frozen: " .. tostring(isFrozen))
                 end
             end)
-            showNotification("Đã kết nối với Master: " .. player.Name)
             print("[TROLLED] Đã kết nối với Master: " .. player.Name)
         end
     end
@@ -127,7 +124,6 @@ local function setupChatListeners()
                     print("Frozen: " .. tostring(isFrozen))
                 end
             end)
-            showNotification("Master đã vào game: " .. player.Name)
             print("[TROLLED] Master đã vào game: " .. player.Name)
         end
     end)
@@ -145,7 +141,6 @@ LocalPlayer.CharacterAdded:Connect(function(newChar)
         frozenConnection:Disconnect()
     end
     
-    showNotification("Character respawned. Waiting for commands...")
 end)
 
 local function protectScript()
