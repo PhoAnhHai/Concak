@@ -1,6 +1,6 @@
 print("Loading main script from GitHub...")
 local success, err = pcall(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/PhoAnhHai/Concak/refs/heads/main/haha"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/PhoAnhHai/Concak/refs/heads/main/cak"))()
 end)
 
 if success then
